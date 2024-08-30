@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
+    id("maven-publish")
 }
 
 android {
@@ -58,6 +59,29 @@ android {
     lint {
         abortOnError = true
         warningsAsErrors = true
+    }
+}
+
+publishing {
+    publications {
+        register<MavenPublication>("release") {
+            groupId = "com.imla.backgroundblur"
+            artifactId = "ui"
+            version = "${project.version}"
+
+            afterEvaluate {
+                from(components["release"])
+            }
+        }
+        repositories {
+            maven {
+                when {
+                    project.version.toString().endsWith("-LOCAL") -> {
+                        url = uri("${System.getProperty("user.home")}/.m2/repository")
+                    }
+                }
+            }
+        }
     }
 }
 
